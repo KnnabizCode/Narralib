@@ -9,7 +9,7 @@ Narralib es una aplicación de escritorio moderna y minimalista que convierte tu
 *   **Conversión PDF a Audio**: Transforma cualquier documento PDF en un archivo de audio MP3 listo para escuchar.
 *   **Voces**: Soporte para múltiples voces en español siendo naturales y fluidas.
 *   **Control de Velocidad**: Ajusta la velocidad de narración (-20% a +20%) para adecuarla a tu ritmo.
-*   **Temas**: Cambia entre **Modo Oscuro** y **Modo Claro** con una interfaz elegante y cuidada.
+*   **Temas**: Cambia entre modo oscuro y modo claro con un botón animado.
 *   **Actualizaciones**: Sistema integrado para buscar y descargar nuevas versiones automáticamente.
 *   **Interfaz Intuitiva**: Diseño limpio y fácil de usar, sin configuraciones complicadas.
 
