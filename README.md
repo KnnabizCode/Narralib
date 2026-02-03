@@ -2,7 +2,7 @@
 
 Narralib es una aplicación de escritorio moderna y minimalista que convierte tus documentos PDF en audiolibros utilizando voces de alta calidad. Ideal para estudiantes, lectores ávidos o cualquier persona que prefiera escuchar su contenido.
 
-![Narralib UI](https://i.imgur.com/Kqxmozq.png)
+![Narralib UI](https://i.imgur.com/mwQsf9F.png)
 
 ## ✨ Características
 

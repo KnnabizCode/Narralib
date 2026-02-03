@@ -1,23 +1,61 @@
 import sys
 import os
+from pathlib import Path
+from typing import Union
 
-# Esta función ayuda a encontrar archivos cuando el programa ya está convertido en un ejecutable (exe).
-# Si estamos probando el código, busca en la carpeta normal.
-# Pero si es un exe, busca en una carpeta temporal especial donde Nuitka pone las cosas.
-def get_resource_path(relative_path):
-    """
-    Obtiene la ruta absoluta de un recurso, compatible con desarrollo y Nuitka (onefile).
-    """
-    if hasattr(sys, 'frozen'):
-        # Estamos corriendo como un ejecutable (creado con Nuitka o PyInstaller)
-        # sys._MEIPASS es usado por PyInstaller, pero Nuitka suele usar el directorio del ejecutable o temp.
-        # Para Nuitka --onefile, a menudo se extrae en un temp, pero sys.executable está donde el exe.
-        # Sin embargo, la forma estándar segura suele ser confiar en relative paths desde el root descomprimido.
-        # Vamos a asumir que los recursos están junto al ejecutable o en el temp base.
-        base_path = os.path.dirname(sys.executable)
-    else:
-        # Estamos corriendo en modo desarrollo (desde el código fuente)
-        # La ruta base es la carpeta superior a 'utils', que es la raíz del proyecto
-        base_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+# Resuelve las rutas del sistema de archivos para desarrollo y producción
+# Asegura que los recursos se encuentren independientemente de si es un script o un ejecutable compilado
 
-    return os.path.join(base_path, relative_path)
+def get_root_path() -> Path:
+    # Determina la raíz del proyecto
+    
+    # Intenta resolver la ruta basándose en la ubicación de este archivo
+    # app/utils/paths.py -> app/utils -> app -> root
+    base_path: Path = Path(__file__).parent.parent.parent
+    
+    # Valida la estructura de directorios
+    if (base_path / "app" / "resources").exists():
+        return base_path
+        
+    # Fallback para entornos congelados (PyInstaller/Nuitka)
+    if getattr(sys, 'frozen', False):
+        return Path(os.path.dirname(sys.executable))
+        
+    return base_path
+
+def get_resource_path(relative_path: str) -> str:
+    # Resuelve la ruta absoluta de un recurso estático
+    base_path: Path = get_root_path()
+    
+    # Intentamos buscar directamente (por si el path ya incluye 'app/resources')
+    path: Path = base_path / relative_path
+    if path.exists():
+        return str(path)
+
+    # Intenta localizar el recurso en la estructura estándar app/resources
+    path = base_path / 'app' / 'resources' / relative_path
+    
+    # Fallback para estructura plana o distribuida
+    if not path.exists():
+        path = base_path / 'resources' / relative_path
+        
+    return str(path)
+
+def get_config_path() -> str:
+    # Obtiene el directorio de configuración del usuario
+    
+    # En Windows, utiliza %APPDATA%
+    app_data: Union[str, None] = os.getenv('APPDATA')
+    if not app_data:
+        # Fallback genérico al directorio home
+        app_data = os.path.expanduser("~")
+        
+    config_dir: Path = Path(app_data) / 'Narralib' / 'config'
+    
+    # Asegura que el directorio exista
+    try:
+        os.makedirs(config_dir, exist_ok=True)
+    except OSError:
+        pass
+            
+    return str(config_dir)
