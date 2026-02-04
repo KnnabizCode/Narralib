@@ -1,14 +1,40 @@
 from PySide6.QtWidgets import (QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, 
                                QPushButton, QLabel, QFileDialog, QProgressBar, 
                                QComboBox, QMessageBox, QFrame)
-from PySide6.QtCore import Qt, QSize
-from PySide6.QtGui import QIcon
+from PySide6.QtCore import Qt, QSize, QUrl, QEvent
+from PySide6.QtGui import QIcon, QMouseEvent, QEnterEvent, QDesktopServices
 from app.core.task_manager import ConversionWorker
 from app.core.tts_engine import TTSEngine
 from app.utils.paths import get_resource_path
 from app.core.config_manager import ConfigManager
 from app.core.updater import check_for_updates
 import os
+
+# Etiqueta clickeable que actúa como un hipervínculo
+class WebLinkLabel(QLabel):
+    def __init__(self, text: str, url: str, parent: None = None) -> None:
+        super().__init__(text, parent)
+        self.url = url
+        self.setCursor(Qt.PointingHandCursor)
+        self.setAlignment(Qt.AlignCenter)
+        
+    def mousePressEvent(self, event: QMouseEvent) -> None:
+        # Abre la URL en el navegador predeterminado
+        QDesktopServices.openUrl(QUrl(self.url))
+        
+    def enterEvent(self, event: QEnterEvent) -> None:
+        # Resalta el texto al pasar el mouse por encima
+        font = self.font()
+        font.setBold(True)
+        self.setFont(font)
+        super().enterEvent(event)
+        
+    def leaveEvent(self, event: QEvent) -> None:
+        # Restaura el estilo original al salir el mouse
+        font = self.font()
+        font.setBold(False)
+        self.setFont(font)
+        super().leaveEvent(event)
 
 class MainWindow(QMainWindow):
     def __init__(self):
@@ -119,6 +145,10 @@ class MainWindow(QMainWindow):
         
         main_layout.addStretch()
         main_layout.addLayout(progress_layout)
+
+        # Enlace del pie de página
+        self.footer_link = WebLinkLabel("Web: knnabiz.vip", "https://knnabiz.vip")
+        main_layout.addWidget(self.footer_link)
         
         self.selected_pdf = None
 
@@ -152,6 +182,10 @@ class MainWindow(QMainWindow):
                     border-color: {text_color};
                 }}
             """
+            
+            # Estilo del footer link para modo oscuro
+            self.footer_link.setStyleSheet(f"color: {text_color}; margin-top: 10px; font-size: 12px;")
+
         else:
             # Modo Claro - Paleta Profesional
             bg_color = "#FAFAFA" # Blanco roto para reducir fatiga visual
@@ -187,6 +221,9 @@ class MainWindow(QMainWindow):
                     background-color: #D1D5DB;
                 }}
             """
+            
+            # Estilo del footer link para modo claro
+            self.footer_link.setStyleSheet(f"color: {text_color}; margin-top: 10px; font-size: 12px;")
 
         self.theme_btn.setText("🌙" if current_theme == "light" else "☀️")
         self.theme_btn.setStyleSheet(theme_btn_style)
@@ -249,7 +286,6 @@ class MainWindow(QMainWindow):
                 QLabel {{
                     color: {text_color};
                     font-size: 14px;
-                    font-weight: 500;
                 }}
                 QPushButton {{
                     background-color: {btn_bg};
