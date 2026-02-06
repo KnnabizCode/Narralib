@@ -44,10 +44,9 @@ class MainWindow(QMainWindow):
         self.setWindowTitle("Narralib")
         self.setMinimumSize(600, 450)
         
-        # Intentamos cargar el icono
-        icon_path = get_resource_path("icons/icon.ico")
-        if os.path.exists(icon_path):
-            self.setWindowIcon(QIcon(icon_path))
+        # Carga el icono de la ventana si existe
+        # Asumimos que existe un icon.ico en resources, en caso contrario, no mostrara el icono
+        self.setWindowIcon(QIcon(get_resource_path("icons/icon.ico")))
         
         self.setup_ui()
         self.load_voices()

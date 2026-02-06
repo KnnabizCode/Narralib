@@ -53,7 +53,7 @@ class ConversionWorker(QThread):
                 self.update_status.emit("¡Completado!")
                 self.finished_task.emit(True, f"Audio guardado en: {self.output_path}")
             else:
-                self.finished_task.emit(False, "Error al generar el audio con el servicio TTS.")
+                self.finished_task.emit(False, "Error al generar el audio, revisa tu conexión a internet.")
                 
         except Exception as e:
             self.finished_task.emit(False, f"Ocurrió un error inesperado: {str(e)}")
